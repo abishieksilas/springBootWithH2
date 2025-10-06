@@ -3,7 +3,12 @@ package com.telusko.SpringJDBCEx.repo;
 import com.telusko.SpringJDBCEx.model.Student;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
 
 @Repository
 public class StudentRepo {
@@ -24,5 +29,20 @@ public class StudentRepo {
         String query = "insert into student (rollno, name, marks) values (?, ?, ?)";
         int rows = jdbc.update(query, s.getRollNo(), s.getName(), s.getMarks());
         System.out.println(rows + " affected");
+    }
+
+    public List<Student> findAll() {
+        String sql = "select * from student";
+
+        RowMapper rowMapper = ( rs,  rowNum) -> {
+                Student s = new Student();
+                s.setName(rs.getString("name"));
+                s.setRollNo(rs.getInt("rollNo"));
+                s.setMarks(rs.getInt("marks"));
+
+                return s;
+        };
+
+        return jdbc.query(sql, rowMapper);
     }
 }
